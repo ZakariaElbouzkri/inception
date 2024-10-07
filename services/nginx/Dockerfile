@@ -1,9 +1,11 @@
-FROM debian:bullseye
+FROM debian:oldoldstable
 
 RUN apt-get update && apt-get install -y \
-    nginx \
+    nginx openssl \
     && rm -rf /var/lib/apt/lists/*
 
-EXPOSE 8080
+COPY conf/nginx.conf /etc/nginx/nginx.conf
 
-CMD [ "nginx", "-g", "daemon off;" ]
+COPY tools/script.sh .
+
+CMD [ "bash", "./script.sh" ]
