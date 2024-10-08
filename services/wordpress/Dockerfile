@@ -1,15 +1,5 @@
 FROM debian:bullseye
 
-# Set environment variables for the database connection
-# ENV MYSQL_DATABASE=mysql_database \
-#     MYSQL_USER=mysql_user \
-#     MYSQL_PASSWORD=mysql_password \
-#     MYSQL_HOST=127.0.0.1 \
-#     WORDPRESS_URL=http://localhost \
-#     WP_ADMIN_USER=admin \
-#     WP_ADMIN_PASS=admin_password \
-#     WP_ADMIN_EMAIL=admin_email    
-
 # Install necessary packages
 RUN apt-get update \
     && apt-get install -y php7.4 php7.4-fpm php7.4-mysql mariadb-client curl \
