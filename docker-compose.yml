@@ -44,7 +44,8 @@ services:
       - WP_ADMIN_PASS=${WP_ADMIN_PASS}
       - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
       - WP_SITE_TITLE="inception"
-
+      - WP_REDIS_HOST="redis"
+      - WP_REDIS_PORT="6379"
     networks:
       - inception
     volumes:
