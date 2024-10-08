@@ -23,7 +23,7 @@ fi
 if ! wp core is-installed --allow-root; then
   wp core install \
   --url=${WORDPRESS_URL} \
-  --title="Inception" \
+  --title=${WP_SITE_TITLE} \
   --admin_user=${WP_ADMIN_USER} \
   --admin_password=${WP_ADMIN_PASS} \
   --admin_email=${WP_ADMIN_EMAIL} \
