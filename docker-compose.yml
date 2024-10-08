@@ -43,6 +43,8 @@ services:
       - WP_ADMIN_USER=${WP_ADMIN_USER}
       - WP_ADMIN_PASS=${WP_ADMIN_PASS}
       - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
+      - WP_SITE_TITLE="inception"
+
     networks:
       - inception
     volumes:
