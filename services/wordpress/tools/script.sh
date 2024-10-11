@@ -65,6 +65,14 @@ until mysql -h ${MYSQL_HOST} -u ${MYSQL_USER} -p${MYSQL_PASSWORD} -e "SHOW DATAB
 done
 echo "Successfully connected to the database."
 
+# Wait for Redis to be ready
+echo "Checking connection to Redis..."
+until redis-cli -h ${WP_REDIS_HOST} -p ${WP_REDIS_PORT} ping | grep -q "PONG"; do
+    echo "Waiting for Redis connection..."
+    sleep 5
+done
+echo "Successfully connected to Redis."
+
 # Start the PHP-FPM process
 echo "Starting PHP-FPM..."
 exec "$@"
