@@ -11,10 +11,7 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
     && mv wp-cli.phar /usr/local/bin/wp
 
 # Set the working directory
-WORKDIR /var/www/html
-
-# Download WordPress
-RUN wp core download --allow-root
+WORKDIR /var/www/wordpress
 
 # Set file ownership for PHP-FPM
 RUN chown -R www-data:www-data /var/www/html
@@ -25,14 +22,14 @@ EXPOSE 9000
 COPY conf/php-fpm.conf /etc/php/7.4/fpm/pool.d/www.conf
 
 # Copy the entrypoint script
-COPY tools/script.sh /entrypoint.sh
+COPY tools/script.sh /setup.sh
 
 RUN chmod +x /entrypoint.sh
 
 
 EXPOSE 9000
 # Entry point
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT [ "/setup.sh" ]
 
 # Run PHP-FPM in the foreground
 CMD ["php-fpm7.4", "-F"]
