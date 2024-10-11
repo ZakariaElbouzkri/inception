@@ -5,7 +5,6 @@ RUN apt-get update \
     && apt-get install -y php7.4 php7.4-fpm php7.4-mysql mariadb-client curl redis-tools \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 RUN mkdir -p /run/php /var/www/wordpress && \
     chown -R www-data:www-data /var/www /run/php
 
@@ -20,20 +19,8 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 # Set the working directory
 WORKDIR /var/www/wordpress
 
-# Set file ownership for PHP-FPM
-# RUN chown -R www-data:www-data /var/www/wordpress
-
-# Download WordPress
-# RUN wp core download --allow-root
-
-# Expose PHP-FPM port
-EXPOSE 9000
-
-
 # Copy the entrypoint script
 COPY tools/script.sh /setup.sh
-
-RUN chmod +x /setup.sh
 
 # Entry point
 ENTRYPOINT [ "bash", "/setup.sh" ]
