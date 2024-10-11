@@ -1,70 +1,76 @@
 version: '3'
 
 services:
-  db:
-    container_name: mariadb
-    build: ./services/mariadb/
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    volumes:
-      - mariadb_data:/var/lib/mysql/
-
-    networks:
-      - inception
-    restart: on-failure
-
-  proxy:
-    container_name: nginx
-    build: ./services/nginx/
-    ports:
-      - "443:443"
-      - "80:80"
-    restart: always
-    networks:
-      - inception
-    depends_on:
-      - db
-      - app
-    volumes:
-      - wordpress_files:/var/www/html/
-
-  app:
-    container_name: wordpress
-    build: ./services/wordpress
-    environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_HOST=db
-      - WORDPRESS_URL=http://localhost
-      - WP_ADMIN_USER=${WP_ADMIN_USER}
-      - WP_ADMIN_PASS=${WP_ADMIN_PASS}
-      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
-      - WP_SITE_TITLE="inception"
-      - WP_REDIS_HOST="redis"
-      - WP_REDIS_PORT="6379"
-    networks:
-      - inception
-    volumes:
-      - wordpress_files:/var/www/html/
-    depends_on:
-      - db
-
-  redis:
-    build: ./services/redis
-    networks:
-      - inception
+    mariadb:
+        container_name: mariadb
+        image: mariadb:inc
+        build:
+            context: ./services/mariadb
+        volumes:
+            - mariadb_data:/var/lib/mysql
+        networks:
+            - inception_net
+        restart: on-failure
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
 
+    wordpress:
+        container_name: wordpress
+        image: wordpress:inc
+        build:
+            context: ./services/wordpress
+        volumes:
+            - wordpress_files:/var/www/wordpress
+        networks:
+            - inception_net
+        depends_on:
+            - mariadb
+            - redis
+        restart: on-failure
+        environment:
+            MYSQL_HOST: mariadb
+            WORDPRESS_URL: http://localhost
+            WP_SITE_TITLE: Inception
+            WP_REDIS_HOST: redis
+            WP_REDIS_PORT: 6379
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            WP_ADMIN_USER: ${WP_ADMIN_USER}
+            WP_ADMIN_PASS: ${WP_ADMIN_PASS}
+            WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+    nginx:
+        container_name: nginx
+        image: nginx:inc
+        build:
+            context: ./services/nginx
+        volumes:
+            - wordpress_files:/var/www/wordpress/
+        networks:
+            - inception_net
+        ports:
+            - "443:443"
+            - "80:80"
+        restart: always
+        depends_on:
+            - wordpress
+
+    redis:
+        container_name: redis
+        image: redis:inc
+        build:
+            context: ./services/redis
+        networks:
+            - inception_net
+        restart: on-failure
 
 volumes:
-  mariadb_data:
-  wordpress_files:
-
+    wordpress_files:
+    mariadb_data:
 
 networks:
-  inception:
-
+    inception_net:
