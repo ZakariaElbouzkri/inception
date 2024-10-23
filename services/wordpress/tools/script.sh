@@ -39,6 +39,11 @@ if ! wp core is-installed --allow-root; then
     --skip-email --allow-root
     echo "WordPress successfully installed."
 
+    echo "Creating wordpress user..."
+    wp user create ${WP_USER_USERNAME} ${WP_USER_EMAIL} \
+        --role=${WP_USER_ROLE} \
+        --user_pass=${WP_USER_PASS} --allow-root
+
     # Install and activate Redis Cache plugin
     echo "Installing and activating Redis Cache plugin..."
     wp plugin install redis-cache --activate --allow-root
