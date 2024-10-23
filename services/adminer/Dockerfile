@@ -4,7 +4,7 @@ FROM debian:bullseye
 RUN apt-get update && apt-get install -y \
     php7.4-fpm \
     php-mysqli \
-    wget \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Set permissions
@@ -17,7 +17,7 @@ RUN sed -i "s|listen = /run/php/php7.4-fpm.sock|listen = 0.0.0.0:9000|" /etc/php
 WORKDIR /var/www/adminer/
 
 # Download Adminer
-RUN wget http://www.adminer.org/latest.php -O adminer.php
+RUN curl -L -k -o adminer.php https://www.adminer.org/latest.php
 
 # Expose port for Nginx to link
 EXPOSE 8080
