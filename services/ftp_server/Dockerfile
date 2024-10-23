@@ -10,9 +10,6 @@ RUN apt-get update && \
 # Create a directory for FTP files and a dummy secure_chroot_dir
 RUN mkdir -p /srv/ftp/wordpress && \
     mkdir -p /var/run/vsftpd/empty 
-    
-EXPOSE 21
-EXPOSE 30000-31000
 
 # Configure vsftpd
 COPY conf/vsftpd.conf /etc/vsftpd.conf

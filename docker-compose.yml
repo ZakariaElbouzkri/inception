@@ -43,6 +43,7 @@ services:
             WP_ADMIN_USER: ${WP_ADMIN_USER}
             WP_ADMIN_PASS: ${WP_ADMIN_PASS}
             WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+
     nginx:
         container_name: nginx
         image: nginx:inc
@@ -67,6 +68,26 @@ services:
         networks:
             - inception_net
         restart: on-failure
+    
+    ftp:
+        container_name: ftp
+        image: ftp:inc
+        build:
+            context: ./services/ftp_server
+        networks:
+            - inception_net
+        ports:
+            - 20:20
+            - 21:21
+            - 30000-30010:30000-30010
+        depends_on:
+            - wordpress
+        volumes:
+            - wordpress_files:/srv/ftp/wordpress/
+        environment:
+            FTP_USER: ftp_user
+            FTP_PASSWORD: ftp_pass
+        
 
 volumes:
     wordpress_files:
