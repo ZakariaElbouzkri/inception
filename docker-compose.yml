@@ -51,11 +51,13 @@ services:
             context: ./services/nginx
         volumes:
             - wordpress_files:/var/www/wordpress/
+            - adminer_files:/var/www/adminer
         networks:
             - inception_net
         ports:
             - "443:443"
             - "80:80"
+            - "8080:8080"
         restart: always
         depends_on:
             - wordpress
@@ -87,11 +89,22 @@ services:
         environment:
             FTP_USER: ftp_user
             FTP_PASSWORD: ftp_pass
-        
+    adminer:
+        container_name: adminer
+        image: adminer:inc
+        build:
+            context: ./services/adminer
+        networks:
+            - inception_net
+        depends_on:
+            - mariadb
+        volumes:
+            - adminer_files:/var/www/adminer
 
 volumes:
     wordpress_files:
     mariadb_data:
+    adminer_files:
 
 networks:
     inception_net:
