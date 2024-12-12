@@ -2,7 +2,7 @@ FROM debian:bullseye
 
 # Install necessary packages
 RUN apt-get update \
-    && apt-get install -y php7.4 php7.4-fpm php7.4-mysql mariadb-client curl redis-tools \
+    && apt-get install -y php7.4 php7.4-fpm php7.4-mysql mariadb-client curl redis-tools php-redis\
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /run/php /var/www/wordpress && \
