@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY conf/nginx.conf /etc/nginx/nginx.conf
 
-COPY conf/ssl/ /etc/nginx/
+COPY conf/certs/ /etc/nginx/certs/
 
 COPY tools/script.sh .
 
