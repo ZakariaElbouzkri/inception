@@ -3,8 +3,12 @@
 # Define the list of domains
 domains=(zel-bouz.42.fr zel-bouz.adminer.42.fr)
 
-# Define the output directory for the certificates
-output_dir="certs"
+# Check if an argument is passed for the output directory, otherwise use the default value
+if [ -z "$1" ]; then
+    output_dir="certs"
+else
+    output_dir="$1"
+fi
 
 # Create the output directory if it doesn't exist
 mkdir -p "$output_dir"
