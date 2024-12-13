@@ -15,6 +15,8 @@ env = {
     "WP_USER_EMAIL": f.email(),
     "WP_USER_ROLE": random.choice(["author", "contributor", "subscriber"]),
     "WP_USER_PASS": f.password(special_chars=False),
+    "FTP_USER": f.user_name(),
+    "FTP_PASSWORD": f.password(special_chars=False),
 }
 
 for key, value in env.items():
