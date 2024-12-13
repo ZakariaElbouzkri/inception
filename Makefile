@@ -25,7 +25,7 @@ DOTENV_FILE = srcs/.env
 CERTS_DIR = nginx/conf/certs
 
 # Ensure required directories exist
-$(shell mkdir -p $(VOLUME_DIR) $(CERTS_DIR))
+$(shell mkdir -p $(WORDPRESS_VOLUME) $(MARIADB_VOLUME) $(ADMINER_VOLUME) $(CERTS_DIR))
 
 # Help target to display usage information
 .PHONY: help
