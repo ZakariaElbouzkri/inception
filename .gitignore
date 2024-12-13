@@ -1,3 +1,5 @@
 *.env
 ssl/
+certs/
 .venv/
+

@@ -1,11 +1,12 @@
+version: '3.6'
 
 
 services:
     mariadb:
-        container_name: mariadb
         image: mariadb:inc
+        container_name: mariadb
         build:
-            context: ./services/mariadb
+            context: ./requirements/mariadb
         volumes:
             - mariadb_data:/var/lib/mysql
         networks:
@@ -22,7 +23,7 @@ services:
         container_name: wordpress
         image: wordpress:inc
         build:
-            context: ./services/wordpress
+            context: ./requirements/wordpress
         volumes:
             - wordpress_files:/var/www/wordpress
         networks:
@@ -52,7 +53,7 @@ services:
         container_name: nginx
         image: nginx:inc
         build:
-            context: ./services/nginx
+            context: ./requirements/nginx
         volumes:
             - wordpress_files:/var/www/wordpress/
             - adminer_files:/var/www/adminer
@@ -65,19 +66,19 @@ services:
             - wordpress
 
     redis:
-        container_name: redis
         image: redis:inc
+        container_name: redis
         build:
-            context: ./services/redis
+            context: ./requirements/bonus/redis
         networks:
             - inception_net
         restart: on-failure
 
     ftp:
-        container_name: ftp
         image: ftp:inc
+        container_name: ftp
         build:
-            context: ./services/ftp_server
+            context: ./requirements/bonus/ftp
         networks:
             - inception_net
         ports:
@@ -95,7 +96,7 @@ services:
         container_name: adminer
         image: adminer:inc
         build:
-            context: ./services/adminer
+            context: ./requirements/bonus/adminer
         networks:
             - inception_net
         depends_on:
