@@ -1,6 +1,5 @@
 version: '3.6'
 
-
 services:
     mariadb:
         image: mariadb:inc
@@ -8,16 +7,12 @@ services:
         build:
             context: ./requirements/mariadb
         volumes:
-            - mariadb_data:/var/lib/mysql
+            - mariadb-data-volume:/var/lib/mysql
         networks:
-            - inception_net
+            - inception-docker-network
         restart: on-failure
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-
+        env_file:
+            - .env
 
     wordpress:
         container_name: wordpress
@@ -25,9 +20,9 @@ services:
         build:
             context: ./requirements/wordpress
         volumes:
-            - wordpress_files:/var/www/wordpress
+            - wordpress-files-volume:/var/www/wordpress
         networks:
-            - inception_net
+            - inception-docker-network
         depends_on:
             - mariadb
             - redis
@@ -35,19 +30,10 @@ services:
         environment:
             MYSQL_HOST: mariadb
             WORDPRESS_URL: https://zel-bouz.42.fr
-            WP_SITE_TITLE: Inception
             WP_REDIS_HOST: redis
             WP_REDIS_PORT: 6379
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            WP_ADMIN_USER: ${WP_ADMIN_USER}
-            WP_ADMIN_PASS: ${WP_ADMIN_PASS}
-            WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
-            WP_USER_USERNAME: ${WP_USER_USERNAME}
-            WP_USER_EMAIL: ${WP_USER_EMAIL}
-            WP_USER_ROLE: ${WP_USER_ROLE}
-            WP_USER_PASS: ${WP_USER_PASS}
+        env_file:
+            - .env
 
     nginx:
         container_name: nginx
@@ -55,15 +41,16 @@ services:
         build:
             context: ./requirements/nginx
         volumes:
-            - wordpress_files:/var/www/wordpress/
-            - adminer_files:/var/www/adminer
+            - wordpress-files-volume:/var/www/wordpress
+            - adminer-files-volume:/var/www/adminer
         networks:
-            - inception_net
+            - inception-docker-network
         ports:
-            - "443:443"
+            - 443:443
         restart: always
         depends_on:
             - wordpress
+            - adminer
 
     redis:
         image: redis:inc
@@ -71,7 +58,7 @@ services:
         build:
             context: ./requirements/bonus/redis
         networks:
-            - inception_net
+            - inception-docker-network
         restart: on-failure
 
     ftp:
@@ -80,7 +67,7 @@ services:
         build:
             context: ./requirements/bonus/ftp
         networks:
-            - inception_net
+            - inception-docker-network
         ports:
             - 20:20
             - 21:21
@@ -88,26 +75,50 @@ services:
         depends_on:
             - wordpress
         volumes:
-            - wordpress_files:/srv/ftp/wordpress/
-        environment:
-            FTP_USER: ftp_user
-            FTP_PASSWORD: ftp_pass
+            - wordpress-files-volume:/srv/ftp/wordpress
+        restart: on-failure
+        env_file:
+            - .env
+
     adminer:
         container_name: adminer
         image: adminer:inc
         build:
             context: ./requirements/bonus/adminer
         networks:
-            - inception_net
+            - inception-docker-network
         depends_on:
             - mariadb
         volumes:
-            - adminer_files:/var/www/adminer
-
-volumes:
-    wordpress_files:
-    mariadb_data:
-    adminer_files:
+            - adminer-files-volume:/var/www/adminer
+        restart: on-failure
 
 networks:
-    inception_net:
+    inception-docker-network:
+        name: inception-docker-network
+        driver: bridge
+
+volumes:
+    wordpress-files-volume:
+        name: wordpress-files-volume
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: ${HOME}/data/wordpress
+
+    mariadb-data-volume:
+        name: mariadb-data-volume
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: ${HOME}/data/mariadb
+
+    adminer-files-volume:
+        name: adminer-files-volume
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: ${HOME}/data/adminer
