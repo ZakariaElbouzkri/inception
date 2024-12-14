@@ -22,7 +22,7 @@ PIP = $(VENV_DIR)/bin/pip
 PYTHON = $(VENV_DIR)/bin/python
 
 DOTENV_FILE = srcs/.env
-CERTS_DIR = nginx/conf/certs
+CERTS_DIR = srcs/requirements/nginx/conf/certs
 
 # Ensure required directories exist
 $(shell mkdir -p $(WORDPRESS_VOLUME) $(MARIADB_VOLUME) $(ADMINER_VOLUME) $(CERTS_DIR))

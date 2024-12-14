@@ -1,22 +1,17 @@
-# Use the Debian base image
-FROM debian:bullseye
+FROM debian:buster
 
-# Install necessary packages
-RUN apt-get update && \
-    apt-get install -y vsftpd && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Install vsftpd and create necessary directories
+RUN apt-get update && apt-get install -y \
+    vsftpd \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create a directory for FTP files and a dummy secure_chroot_dir
-RUN mkdir -p /srv/ftp/wordpress && \
-    mkdir -p /var/run/vsftpd/empty
+COPY conf/vsftpd.conf /etc/vsftpd/vsftpd.conf
 
-# Configure vsftpd
-COPY conf/vsftpd.conf /etc/vsftpd.conf
-COPY tools/setup.sh /setup.sh
+RUN useradd -u 1001 -m -d /home/ftp $FTP_USER && \
+    echo "$FTP_USER:$FTP_PASSWORD" | chpasswd
 
-ENTRYPOINT [ "bash", "/setup.sh" ]
-# Expose FTP port
+EXPOSE 21 30000-30010
 
-# Start the FTP server
-CMD ["/usr/sbin/vsftpd", "/etc/vsftpd.conf"]
+ENTRYPOINT ['/setup.sh']
+
+CMD ["vsftpd"]

@@ -68,13 +68,12 @@ services:
         networks:
             - inception-docker-network
         ports:
-            - 20:20
             - 21:21
-            - 30000-30010:30000-30010
+
         depends_on:
             - wordpress
         volumes:
-            - wordpress-files-volume:/srv/ftp/wordpress
+            - wordpress-files-volume:/home/ftp/
         restart: on-failure
         env_file:
             - .env
@@ -104,7 +103,7 @@ volumes:
         driver_opts:
             o: bind
             type: none
-            device: ${HOME}/data/wordpress
+            device: /home/zel-bouz/data/wordpress
 
     mariadb-data-volume:
         name: mariadb-data-volume
@@ -112,7 +111,7 @@ volumes:
         driver_opts:
             o: bind
             type: none
-            device: ${HOME}/data/mariadb
+            device: /home/zel-bouz/data/mariadb
 
     adminer-files-volume:
         name: adminer-files-volume
@@ -120,4 +119,4 @@ volumes:
         driver_opts:
             o: bind
             type: none
-            device: ${HOME}/data/adminer
+            device: /home/zel-bouz/data/adminer
