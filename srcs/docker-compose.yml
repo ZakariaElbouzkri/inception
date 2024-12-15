@@ -19,12 +19,9 @@ services:
         build:
             context: ./requirements/wordpress
         volumes:
-            - wordpress-files-volume:/var/www/wordpress
+            - wordpress-files-volume:/var/www/html
         networks:
             - inception-docker-network
-        depends_on:
-            - mariadb
-            - redis
         restart: on-failure
         environment:
             MYSQL_HOST: mariadb
@@ -40,8 +37,7 @@ services:
         build:
             context: ./requirements/nginx
         volumes:
-            - wordpress-files-volume:/var/www/wordpress
-            - adminer-files-volume:/var/www/adminer
+            - wordpress-files-volume:/var/www/html
         networks:
             - inception-docker-network
         ports:
@@ -49,7 +45,6 @@ services:
         restart: always
         depends_on:
             - wordpress
-            - adminer
 
     redis:
         image: redis:inc
@@ -87,8 +82,6 @@ services:
             - inception-docker-network
         depends_on:
             - mariadb
-        volumes:
-            - adminer-files-volume:/var/www/adminer
         restart: on-failure
 
 networks:
@@ -103,7 +96,7 @@ volumes:
         driver_opts:
             o: bind
             type: none
-            device: /home/zel-bouz/data/wordpress
+            device: /home/zakariaelbouzkri/data/wordpress
 
     mariadb-data-volume:
         name: mariadb-data-volume
@@ -113,10 +106,3 @@ volumes:
             type: none
             device: /home/zel-bouz/data/mariadb
 
-    adminer-files-volume:
-        name: adminer-files-volume
-        driver: local
-        driver_opts:
-            o: bind
-            type: none
-            device: /home/zel-bouz/data/adminer

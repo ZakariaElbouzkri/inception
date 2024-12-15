@@ -1,26 +1,16 @@
-FROM debian:bullseye
+FROM debian:buster
 
-# Install necessary packages
+
 RUN apt-get update && apt-get install -y \
-    php7.4-fpm \
-    php-mysqli \
+    php php-mysql \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Set permissions
-RUN mkdir -p /run/php /var/www/adminer && \
-    chown -R www-data:www-data /var/www /run/php
+WORKDIR /var/www/html
 
-# Update php-fpm to listen on TCP port 9000
-RUN sed -i "s|listen = /run/php/php7.4-fpm.sock|listen = 0.0.0.0:9000|" /etc/php/7.4/fpm/pool.d/www.conf
-
-WORKDIR /var/www/adminer/
-
-# Download Adminer
 RUN curl -L -k -o adminer.php https://www.adminer.org/latest.php
 
-# Expose port for Nginx to link
-EXPOSE 8080
+RUN chown -R www-data:www-data /var/www/html/ && \
+    chmod 755 /var/www/html/adminer.php
 
-# Start PHP-FPM and Nginx
-CMD [ "php-fpm7.4", "-F" ]
+CMD ["php", "-S", "0.0.0.0:8080", "adminer.php"]

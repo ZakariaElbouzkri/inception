@@ -2,7 +2,7 @@
 
 set -e
 
-MARKER_FILE='/var/www/wordpress/.wp_installed'
+MARKER_FILE='/var/www/html/.wp_installed'
 
 # Wait for MariaDB to be ready
 until mysql -h "${MYSQL_HOST}" -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SHOW DATABASES;" > /dev/null 2>&1; do
