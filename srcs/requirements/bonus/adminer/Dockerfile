@@ -4,6 +4,7 @@ FROM debian:buster
 RUN apt-get update && apt-get install -y \
     php \
     curl \
+    php-mysqli \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
