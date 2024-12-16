@@ -86,11 +86,6 @@
                 {source: "portainer", target: "docker-socket"},
             ];
 
-            const volumes = [
-                {name: 'wordpress-files', targets: ['ftp', 'nginx']},
-                {name: 'mariadb', targets: ['mariadb']}
-            ];
-
             const levels = [
                 ['network-entrypoint'],
                 ['nginx', 'ftp'],
@@ -137,21 +132,6 @@
                 .attr("class", "port-label")
                 .attr("dy", "2em")
                 .text(d => `Ports: ${d.ports.join(", ")}`);
-
-            // Draw volume links
-            volumes.forEach(volume => {
-                volume.targets.forEach(target => {
-                    const source = services.find(s => s.name === volume.name);
-                    const targetService = services.find(s => s.name === target);
-                    svg.append("line")
-                        .attr("x1", source.x)
-                        .attr("y1", source.y)
-                        .attr("x2", targetService.x)
-                        .attr("y2", targetService.y)
-                        .attr("class", "volume")
-                        .attr("stroke-width", 3);
-                });
-            });
         </script>
     </div>
 </body>
