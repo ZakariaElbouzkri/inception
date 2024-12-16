@@ -63,6 +63,18 @@ services:
             - inception-docker-network
         restart: on-failure
 
+    portainer:
+        image: portainer:inc
+        container_name: portainer
+        build: ./requirements/bonus/portainer
+        networks:
+          - inception-docker-network
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        restart: unless-stopped
+        env_file:
+          - .env
+
     ftp:
         image: ftp:inc
         container_name: ftp
