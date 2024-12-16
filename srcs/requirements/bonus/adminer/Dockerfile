@@ -2,15 +2,13 @@ FROM debian:buster
 
 
 RUN apt-get update && apt-get install -y \
-    php php-mysql \
+    php \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
 
 RUN curl -L -k -o adminer.php https://www.adminer.org/latest.php
+RUN curl -L -k -o adminer.css https://raw.githubusercontent.com/Niyko/Hydra-Dark-Theme-for-Adminer/master/adminer.css
 
-RUN chown -R www-data:www-data /var/www/html/ && \
-    chmod 755 /var/www/html/adminer.php
-
-CMD ["php", "-S", "0.0.0.0:8080", "adminer.php"]
+CMD ["php", "-S", "0.0.0.0:8080"]
