@@ -46,6 +46,14 @@ services:
         depends_on:
             - wordpress
 
+    app:
+        container_name: app
+        image: app:inc
+        build:
+            context: ./requirements/bonus/app
+        networks:
+            - inception-docker-network
+
     redis:
         image: redis:inc
         container_name: redis

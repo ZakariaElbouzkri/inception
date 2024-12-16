@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inception Project Network Diagram</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.1.1/d3.min.js"></script>
+    <style>
+        body {
+            background-color: #282a36;
+            color: #f8f8f2;
+        }
+        .service-box {
+            fill: #44475a;
+            stroke: #50fa7b;
+            stroke-width: 2;
+        }
+        .volume {
+            fill: #6272a4;
+            stroke: #ff79c6;
+            stroke-dasharray: 4,4;
+        }
+        .link {
+            stroke: #f8f8f2;
+            stroke-dasharray: 3,3;
+        }
+        .port-label {
+            font-size: 10px;
+            fill: #f8f8f2;
+        }
+        .info-text {
+            font-size: 12px;
+            fill: #f8f8f2;
+        }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-6xl mx-auto bg-gray-800 shadow-lg rounded-lg p-8">
+        <h1 class="text-3xl font-bold text-center mb-8 text-pink-400">Inception Project Network Diagram</h1>
+
+        <div id="networkDiagram" class="w-full h-[600px] mb-6"></div>
+
+        <div class="mt-4">
+            <h2 class="text-lg font-semibold text-pink-300">Diagram Explanation</h2>
+            <ul class="list-disc list-inside space-y-2 text-gray-300 mt-2">
+                <li><b>Nginx:</b> Acts as the reverse proxy for wordpres, portainer, static-web-app.</li>
+                <li><b>FTP:</b> Handles file transfers for WordPress</li>
+                <li><b>WordPress:</b> Provides content management functionality and connects to MariaDB and Redis.</li>
+                <li><b>Adminer:</b> Provides a web-based interface to manage the MariaDB database.</li>
+                <li><b>Portainer:</b> Manages Docker containers.</li>
+                <li><b>Static Web App:</b> this page, provides insites of the network.</li>
+                <li><b>MariaDB:</b> Stores relational data for WordPress.</li>
+                <li><b>Redis:</b> Caches data to optimize WordPress performance.</li>
+            </ul>
+        </div>
+
+        <script>
+            const width = 1000, height = 600;
+            const svg = d3.select("#networkDiagram")
+                .append("svg")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("viewBox", `0 0 ${width} ${height}`);
+
+            const services = [
+                {name: "nginx", ports: ["443"], targets: ["wordpress", "adminer", 'static-web-app', 'portainer'], x: width / 3, y: 150, },
+                {name: "ftp", ports: ["21", "40000-40010"], targets: [], x: width / 3 + 250, y: 150, },
+                {name: "portainer", ports: ["80"], targets: ['docker-socket'], x: 150, y: 300, },
+                {name: "adminer", ports: ["8080"], targets: ['mariadb'], x: 350, y: 300, },
+                {name: "static-web-app", ports: ["8000"], targets: [], x: 550, y: 300, },
+                {name: "wordpress", ports: ["9000"], targets: ['mariadb', 'redis'], x: 750, y: 300, },
+                {name: "mariadb", ports: ["3306"], targets: [], x: 550, y: 450, },
+                {name: "redis", ports: ["6379"], targets: [], x: 750, y: 450, },
+                {name: "docker-socket", ports: ["/var/run/docker.sock"], targets: [], x: 150, y: 550, },
+            ];
+
+            const connections = [
+                {source: "nginx", target: "wordpress"},
+                {source: "nginx", target: "adminer"},
+                {source: "nginx", target: "static-web-app"},
+                {source: "nginx", target: "portainer"},
+                {source: "wordpress", target: "mariadb"},
+                {source: "wordpress", target: "redis"},
+                {source: "adminer", target: "mariadb"},
+                {source: "portainer", target: "docker-socket"},
+            ];
+
+            const volumes = [
+                {name: 'wordpress-files', targets: ['ftp', 'nginx']},
+                {name: 'mariadb', targets: ['mariadb']}
+            ];
+
+            const levels = [
+                ['network-entrypoint'],
+                ['nginx', 'ftp'],
+                ['wordpress', 'adminer', 'static-web-app', 'portainer'],
+                ['mariadb', 'redis']
+            ];
+
+            // Draw connections
+            connections.forEach(conn => {
+                const source = services.find(s => s.name === conn.source);
+                const target = services.find(s => s.name === conn.target);
+                svg.append("line")
+                    .attr("x1", source.x)
+                    .attr("y1", source.y)
+                    .attr("x2", target.x)
+                    .attr("y2", target.y)
+                    .attr("class", "link")
+                    .attr("stroke-width", 2);
+            });
+
+            // Draw service boxes
+            const nodes = svg.selectAll(".service")
+                .data(services)
+                .enter()
+                .append("g")
+                .attr("class", "service")
+                .attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+            nodes.append("rect")
+                .attr("width", 180)
+                .attr("height", 60)
+                .attr("x", -70)
+                .attr("y", -30)
+                .attr("class", "service-box");
+
+            nodes.append("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "0.3em")
+                .attr("fill", "#f8f8f2")
+                .text(d => d.name);
+
+            nodes.append("text")
+                .attr("text-anchor", "middle")
+                .attr("class", "port-label")
+                .attr("dy", "2em")
+                .text(d => `Ports: ${d.ports.join(", ")}`);
+
+            // Draw volume links
+            volumes.forEach(volume => {
+                volume.targets.forEach(target => {
+                    const source = services.find(s => s.name === volume.name);
+                    const targetService = services.find(s => s.name === target);
+                    svg.append("line")
+                        .attr("x1", source.x)
+                        .attr("y1", source.y)
+                        .attr("x2", targetService.x)
+                        .attr("y2", targetService.y)
+                        .attr("class", "volume")
+                        .attr("stroke-width", 3);
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>
