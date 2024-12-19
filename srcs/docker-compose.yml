@@ -76,20 +76,20 @@ services:
           - .env
 
     ftp:
-        image: ftp:inc
         container_name: ftp
+        image: ftp:inc
         build:
             context: ./requirements/bonus/ftp
         networks:
             - inception-docker-network
         ports:
+            - 20:20
             - 21:21
-
+            - 30000-30010:30000-30010
         depends_on:
             - wordpress
         volumes:
-            - wordpress-files-volume:/home/ftp/
-        restart: on-failure
+            - wordpress-files-volume:/home/${FTP_USER}/
         env_file:
             - .env
 
@@ -124,5 +124,4 @@ volumes:
         driver_opts:
             o: bind
             type: none
-            device: /home/zel-bouz/data/mariadb
-
+            device: /home/zakariaelbouzkri/data/mariadb
